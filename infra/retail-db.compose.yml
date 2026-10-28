@@ -1,0 +1,45 @@
+# The retailer's operational database: sales, stock ledger, purchase orders,
+# supplier terms. A plain Postgres, standing in for the system a shop already runs.
+#
+# It joins the Zetaris stack's Docker network, so the Zetaris query engine
+# reaches it as `retail-db:5432` and registers it as a datasource. No port is
+# published on the host: the agent never talks to this database directly, only
+# through Zetaris.
+#
+# Started and loaded by `npx tsx scripts/register_zetaris.ts --execute`, which
+# passes RETAIL_DB_PASSWORD from the project's .env. Postgres applies that
+# password only when the volume is first created; to change it later, run
+# `docker compose --env-file .env -f infra/retail-db.compose.yml down -v` from the
+# project root and load again.
+
+name: stockout
+
+services:
+  retail-db:
+    image: postgres:16-alpine
+    container_name: stockout-retail-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: retail
+      POSTGRES_USER: retail
+      POSTGRES_PASSWORD: ${RETAIL_DB_PASSWORD:?set RETAIL_DB_PASSWORD in .env}
+    volumes:
+      - retail-pgdata:/var/lib/postgresql/data
+    networks:
+      zetaris:
+        aliases: [retail-db]
+    healthcheck:
+      # Over TCP on purpose: during first-time setup Postgres runs a temporary
+      # socket-only server and then restarts, so a socket check passes too early.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U retail -d retail"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+networks:
+  zetaris:
+    external: true
+    name: ${ZETARIS_DOCKER_NETWORK:-zetaris_default}
+
+volumes:
+  retail-pgdata:

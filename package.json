@@ -1,0 +1,24 @@
+{
+  "name": "stockout-why",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An agent that explains why a product ran out of stock, and cites the rows behind every claim.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gen-data": "tsx data/generate.ts",
+    "register": "tsx scripts/register_zetaris.ts",
+    "smoke": "tsx scripts/smoke_test.ts",
+    "investigate": "tsx src/cli.ts",
+    "pretest": "tsx data/generate.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "conformance": "tsx vendor/meterless/engines/hmem/conformance/runner.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

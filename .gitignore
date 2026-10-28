@@ -1,0 +1,29 @@
+# secrets - never commit
+.env
+*.pem
+*.key
+
+# deps & build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# generated data & local state
+data/generated/
+.hmem/
+.hmem-smoke/
+logs/
+*.log
+
+# vendored third-party spec (cloned, not ours)
+vendor/
+
+# os
+Thumbs.db
+.DS_Store
+
+# organiser material and local notes, not part of the project
+Participant setup guide.pdf
+run.txt
+z.txt
+submission/
